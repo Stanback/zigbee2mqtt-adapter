@@ -44,7 +44,7 @@ class MqttProperty extends Property {
 }
 
 class MqttDevice extends Device {
-  constructor(adapter, id, description) {
+  constructor(adapter, id, description, info) {
     super(adapter, id);
     this.name = description.name;
     this['@type'] = description['@type'];
@@ -54,6 +54,19 @@ class MqttDevice extends Device {
     }
     for (const [name, desc] of Object.entries(description.events || {})) {
       this.addEvent(name, desc);
+    }
+    this.updateProperties(description, info);
+  }
+
+  updateProperties(description, info) {
+    for (const key of Object.keys(info)) {
+      const property = this.findProperty(key);
+      if (!property) {
+        continue;
+      }
+      const { fromMqtt = identity } = description.properties[key];
+      property.setCachedValue(fromMqtt(msg[key], msg));
+      this.notifyPropertyChanged(property);
     }
   }
 }
@@ -96,15 +109,7 @@ class ZigbeeMqttAdapter extends Adapter {
         );
         device.eventNotify(event);
       }
-      for (const key of Object.keys(msg)) {
-        const property = device.findProperty(key);
-        if (!property) {
-          continue;
-        }
-        const { fromMqtt = identity } = description.properties[key];
-        property.setCachedValue(fromMqtt(msg[key], msg));
-        device.notifyPropertyChanged(property);
-      }
+      device.updateProperties(description, msg);
     }
   }
 
@@ -118,7 +123,7 @@ class ZigbeeMqttAdapter extends Adapter {
     if (!description) {
       return;
     }
-    const device = new MqttDevice(this, info.friendly_name, description);
+    const device = new MqttDevice(this, info.friendly_name, description, info);
     this.handleDeviceAdded(device);
   }
 
