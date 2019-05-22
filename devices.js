@@ -130,8 +130,22 @@ module.exports = {
   },
   'hue5': {
     name: 'Philips Hue dimmer switch',
-    '@type': ['Light', 'OnOffSwitch'],
+    '@type': ['OnOffSwitch', 'PushButton', 'MultiLevelSwitch'],
     properties: {
+      state: {
+        '@type': 'OnOffProperty',
+        type: 'boolean',
+        fromMqtt: v => v === 'ON',
+        toMqtt: v => (v ? 'ON' : 'OFF'),
+      },
+      brightness: {
+        '@type': 'LevelProperty',
+        type: 'number',
+        minimum: 0,
+        maximum: 100,
+        fromMqtt: v => (v / 255) * 100,
+        toMqtt: v => (v / 100) * 255,
+      },
       battery: {
         type: 'integer',
         unit: 'percent',
@@ -148,8 +162,9 @@ module.exports = {
       tap: {
         '@type': 'PressedEvent',
         type: 'integer',
-        mqttField: 'side',
+        mqttField: 'tap',
       },
+      /* DoublePressedEvent, LongPressedEvent */
     },
   },
 };
