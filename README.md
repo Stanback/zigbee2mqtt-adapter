@@ -3,6 +3,9 @@ Zigbee2Mqtt Adapter
 
 This adapter for [WebThings Gateway by Mozilla](https://iot.mozilla.org/gateway/) allows to use awesome [zigbee2mqtt](http://zigbee2mqtt.io/) project to support lots of zigbee devices on a cheap `cc2531` usb stick zigbee dongle.
 
+Make sure to set `include_device_information: true` in the
+configuration.yaml file for zigbee2mqtt.
+
 Currently supported devices:
 - Aqara ZigBee Light Bulb
 - Xiaomi Magnet Sensor

@@ -65,7 +65,7 @@ class MqttDevice extends Device {
         continue;
       }
       const { fromMqtt = identity } = description.properties[key];
-      property.setCachedValue(fromMqtt(msg[key], msg));
+      property.setCachedValue(fromMqtt(info[key], info));
       this.notifyPropertyChanged(property);
     }
   }
@@ -93,9 +93,7 @@ class ZigbeeMqttAdapter extends Adapter {
       }
     }
     if (!topic.startsWith(`${this.config.prefix}/bridge`)) {
-      // Not receiving modelId in msg payload, get friendlyName from topic
       const friendlyName = topic.replace(`${this.config.prefix}/`, '');
-      // const description = Devices[msg.device.modelId];
       const description = Devices[friendlyName];
       const device = this.devices[friendlyName];
       if (!device) {
@@ -118,7 +116,6 @@ class ZigbeeMqttAdapter extends Adapter {
   }
 
   addDevice(info) {
-    // const description = Devices[info.modelId];
     const description = Devices[info.friendly_name];
     if (!description) {
       return;
